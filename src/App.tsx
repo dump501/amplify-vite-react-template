@@ -1,52 +1,32 @@
 import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-import "@aws-amplify/ui-react/styles.css";
-import { Authenticator } from "@aws-amplify/ui-react";
-
-const client = generateClient<Schema>();
+//import "@aws-amplify/ui-react/styles.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./Pages/Home";
+import About from "./Pages/About";
+import NavigationBar from "./Components/NavigationBar";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Posts from "./Pages/Posts";
+import PostCreate from "./Pages/PostCreate";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import ConfirmSignUp from "./Pages/ConfirmSignUp";
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
-
-  const deleteTodo = (id: string) => {
-    client.models.Todo.delete({ id });
-  };
-
   return (
-    <Authenticator>
-      {({ signOut }) => (
-        <main>
-          <h1>My todos</h1>
-          <button onClick={createTodo}>+ new</button>
-          <ul>
-            {todos.map((todo) => (
-              <li key={todo.id} onClick={() => deleteTodo(todo.id)}>
-                {todo.content}
-              </li>
-            ))}
-          </ul>
-          <div>
-            🥳 App successfully hosted. Try creating a new todo.
-            <br />
-            <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-              Review next step of this tutorial.
-            </a>
-          </div>
-          <button onClick={signOut}>Sign out </button>
-        </main>
-      )}
-    </Authenticator>
+    <BrowserRouter>
+      <NavigationBar />
+      <Routes>
+        <Route path="/" Component={Home} />
+        <Route path="/about" Component={About} />
+        <Route path="/login" Component={Login} />
+        <Route path="/register" Component={Register} />
+        <Route path="/confirm-signup" Component={ConfirmSignUp} />
+        <Route path="/post">
+          <Route path="" Component={Posts} />
+          <Route path="create" Component={PostCreate} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

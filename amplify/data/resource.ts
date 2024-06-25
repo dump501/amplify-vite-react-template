@@ -12,6 +12,36 @@ const schema = a.schema({
       content: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+
+  Post: a
+    .model({
+      id: a.id(),
+      title: a.string(),
+      smallDescription: a.string(),
+      content: a.string(),
+      thumbnail: a.string(),
+      isPublished: a.boolean(),
+      comments: a.hasMany("Comment", "postId"),
+      favorites: a.hasMany("Favorite", "postId"),
+    })
+    .authorization((allow) => [allow.owner(), allow.publicApiKey()]),
+
+  Comment: a
+    .model({
+      id: a.id(),
+      content: a.string(),
+      postId: a.id(),
+      post: a.belongsTo("Post", "postId"),
+    })
+    .authorization((allow) => [allow.owner(), allow.publicApiKey()]),
+
+  Favorite: a
+    .model({
+      id: a.id(),
+      postId: a.id(),
+      post: a.belongsTo("Post", "postId"),
+    })
+    .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -19,7 +49,8 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode: "userPool",
+    // defaultAuthorizationMode: "apiKey",
     // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
